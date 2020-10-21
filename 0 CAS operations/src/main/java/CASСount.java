@@ -1,18 +1,19 @@
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
+import java.util.concurrent.atomic.AtomicReference;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-@ThreadSafe
-public class CASСount<T> {
-    @GuardedBy("this")
-    private final AtomicInteger count = new AtomicInteger();
+public class CASСount {
+    private final AtomicReference<Integer> count = new AtomicReference<>(0);
 
     public void increment() {
-        count.set(count.incrementAndGet());
+        int oldValue;
+        int incrementValue;
+        do {
+            oldValue = count.get();
+            incrementValue = oldValue + 1;
+        } while (!count.compareAndSet(oldValue, incrementValue));
     }
 
     public int get() {
         return count.get();
     }
 }
+
